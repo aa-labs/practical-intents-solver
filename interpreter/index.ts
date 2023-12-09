@@ -71,10 +71,6 @@ const updateProgramCounterOnChain = async (
   txs: { txHash: string; chainId: number }[],
   type: 'swap' | 'consolidate' | 'call'
 ) => {
-  if (txs.length === 0) {
-    console.log('No txs to update');
-    return;
-  }
   const explorerLinks = txs
     .map((tx) => toExplorerUrl(tx.txHash, tx.chainId as any))
     .reduce((a, b) => `${a},${b}`);
@@ -83,6 +79,11 @@ const updateProgramCounterOnChain = async (
   );
 
   await updateProgramCounter(programCounter);
+
+  if (txs.length === 0) {
+    console.log('No txs to update');
+    return;
+  }
   await updateTxHash(programCounter, explorerLinks, type);
 };
 
@@ -222,7 +223,7 @@ const handleCall = async (programId: number) => {
     }
     await updateProgramCounterOnChain(programId, programCounter, [txn], 'call');
   } else {
-    await updateProgramCounterOnChain(programId, programCounter, [txn], 'call');
+    await updateProgramCounterOnChain(programId, programCounter, [], 'call');
   }
 };
 
