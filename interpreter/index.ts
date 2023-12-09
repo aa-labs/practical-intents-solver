@@ -14,7 +14,7 @@ import { swapHandler } from '../solver/1inch';
 import { callHandler } from '../solver/call';
 
 // set to false to debug interpreter
-const shouldExecute = true;
+const shouldExecute = false;
 
 const getPayload = async (actionData: any) => {
   const wallet = new ethers.Wallet(STACKR_PRIVATE_KEY);
@@ -153,21 +153,21 @@ const handleConsolidate = async (programId: number) => {
     fromChainsLength,
   });
 
-  if (!shouldExecute) {
-    return;
+  if (shouldExecute) {
+    const txns = await consolidateHandler(
+      fromChains as (keyof typeof addressToTokenName)[],
+      destChain,
+      value,
+      smartAccountAddress
+    );
+    if (!txns) {
+      console.log('VM: CONSOLIDATE: No txns need to be executed');
+      return;
+    }
+    await updateProgramCounterOnChain(programId, programCounter, txns, 'consolidate');
+  } else {
+    await updateProgramCounterOnChain(programId, programCounter, [], 'consolidate');
   }
-
-  const txns = await consolidateHandler(
-    fromChains as (keyof typeof addressToTokenName)[],
-    destChain,
-    value,
-    smartAccountAddress
-  );
-  if (!txns) {
-    console.log('VM: CONSOLIDATE: No txns need to be executed');
-    return;
-  }
-  await updateProgramCounterOnChain(programId, programCounter, txns, 'consolidate');
 };
 
 const handleSwap = async (programId: number) => {
@@ -182,21 +182,21 @@ const handleSwap = async (programId: number) => {
   const to = tokenNameToAddress[chainId][toTokenSymbol];
   console.log('VM: SWAP: Params: ', { value: value.toString(), to, from, chainId });
 
-  if (!shouldExecute) {
-    return;
+  if (shouldExecute) {
+    const txn = await swapHandler(
+      Object.keys(addressToTokenName[chainId as keyof typeof addressToTokenName]),
+      to,
+      value,
+      chainId,
+      smartAccountAddress
+    );
+    if (!txn) {
+      throw new Error('VM: SWAP: No txns found');
+    }
+    await updateProgramCounterOnChain(programId, programCounter, [txn], 'swap');
+  } else {
+    await updateProgramCounterOnChain(programId, programCounter, [], 'swap');
   }
-
-  const txn = await swapHandler(
-    Object.keys(addressToTokenName[chainId as keyof typeof addressToTokenName]),
-    to,
-    value,
-    chainId,
-    smartAccountAddress
-  );
-  if (!txn) {
-    throw new Error('VM: SWAP: No txns found');
-  }
-  await updateProgramCounterOnChain(programId, programCounter, [txn], 'swap');
 };
 
 const handleCall = async (programId: number) => {
@@ -211,15 +211,15 @@ const handleCall = async (programId: number) => {
 
   console.log('VM: CALL: Params: ', { value: value.toString(), callData, to, chainId });
 
-  if (!shouldExecute) {
-    return;
+  if (shouldExecute) {
+    const txn = await callHandler(smartAccountAddress, chainId, to, value, callData);
+    if (!txn) {
+      throw new Error('VM: CALL: No txns found');
+    }
+    await updateProgramCounterOnChain(programId, programCounter, [txn], 'call');
+  } else {
+    await updateProgramCounterOnChain(programId, programCounter, [txn], 'call');
   }
-
-  const txn = await callHandler(smartAccountAddress, chainId, to, value, callData);
-  if (!txn) {
-    throw new Error('VM: CALL: No txns found');
-  }
-  await updateProgramCounterOnChain(programId, programCounter, [txn], 'call');
 };
 
 const handleDefault = async (token: string) => {
