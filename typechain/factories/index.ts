@@ -3,5 +3,6 @@
 /* eslint-disable */
 export { ERC20__factory } from "./ERC20__factory";
 export { Entrypoint__factory } from "./Entrypoint__factory";
+export { NFT__factory } from "./NFT__factory";
 export { SmartAccount__factory } from "./SmartAccount__factory";
 export { SocketGateway__factory } from "./SocketGateway__factory";
