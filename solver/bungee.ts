@@ -1,9 +1,9 @@
 import { formatUnits } from 'ethers/lib/utils';
 import { getTokenPrice } from '../service/coinmarketcap';
-import { addressToTokenName, BUNGEE_API_KEY } from '../conifg/config';
+import { addressToTokenName, BUNGEE_API_KEY } from '../config/config';
 import { ERC20__factory } from '../typechain';
 import { BigNumber } from 'ethers';
-import { sendUserOp, smartAccounts } from '../conifg/smart-account';
+import { sendUserOp, smartAccounts } from '../config/smart-account';
 import axios, { Axios } from 'axios';
 import { TokenRecord, tokensOwnedOnChain } from '../utils/utils';
 

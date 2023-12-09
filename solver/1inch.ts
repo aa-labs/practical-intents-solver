@@ -1,10 +1,10 @@
 import axios, { Axios } from 'axios';
 import { BigNumber, BigNumberish } from 'ethers';
 import { decimals, tokensOwnedOnChain } from '../utils/utils';
-import { NATIVE_TOKEN_ADDRESS, addressToTokenName } from '../conifg/config';
+import { NATIVE_TOKEN_ADDRESS, addressToTokenName } from '../config/config';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { getTokenPrice } from '../service/coinmarketcap';
-import { sendUserOp, smartAccounts } from '../conifg/smart-account';
+import { sendUserOp, smartAccounts } from '../config/smart-account';
 
 const oneInchAxiosClient = new Axios({
   ...axios.defaults,

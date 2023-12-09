@@ -1,8 +1,8 @@
 import { BigNumber } from 'ethers';
 import { swapHandler } from './solver/1inch';
 import { consolidateHandler } from './solver/bungee';
-import { NATIVE_TOKEN_ADDRESS, addressToTokenName } from './conifg/config';
-import { smartAccounts, bundlers, init } from './conifg/smart-account';
+import { NATIVE_TOKEN_ADDRESS, addressToTokenName } from './config/config';
+import { smartAccounts, bundlers, init } from './config/smart-account';
 import { parseEther, parseUnits } from 'ethers/lib/utils';
 import { execute } from './interpreter';
 

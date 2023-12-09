@@ -1,5 +1,5 @@
 import axios, { Axios } from 'axios';
-import { COINMARKETCAP_API_KEY } from '../conifg/config';
+import { COINMARKETCAP_API_KEY } from '../config/config';
 
 const axiosClient = new Axios({
   ...axios.defaults,

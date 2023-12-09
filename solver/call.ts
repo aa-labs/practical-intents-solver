@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { sendUserOp, smartAccounts } from '../conifg/smart-account';
+import { sendUserOp, smartAccounts } from '../config/smart-account';
 
 export const callHandler = async (
   smartAccountAddress: string,

@@ -1,4 +1,4 @@
-import { NATIVE_TOKEN_ADDRESS, addressToTokenName, config, explorerUrls } from '../conifg/config';
+import { NATIVE_TOKEN_ADDRESS, addressToTokenName, config, explorerUrls } from '../config/config';
 import { formatEther, formatUnits } from 'ethers/lib/utils';
 import { ERC20__factory } from '../typechain';
 import { BigNumber } from 'ethers';
