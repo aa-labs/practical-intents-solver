@@ -1,6 +1,14 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { decodeHexString, toExplorerUrl } from '../utils/utils';
-import { addressToTokenName, chainNameToId, tokenNameToAddress } from '../config/config';
+import {
+  ACTION_INPUT_TYPES,
+  STACKR_DOMAIN,
+  STACKR_PRIVATE_KEY,
+  addressToTokenName,
+  chainNameToId,
+  rollupAxiosClient,
+  tokenNameToAddress,
+} from '../config/config';
 import { consolidateHandler } from '../solver/bungee';
 import { swapHandler } from '../solver/1inch';
 import { callHandler } from '../solver/call';
@@ -8,17 +16,70 @@ import { callHandler } from '../solver/call';
 // set to false to debug interpreter
 const shouldExecute = true;
 
+const getPayload = async (actionData: any) => {
+  const wallet = new ethers.Wallet(STACKR_PRIVATE_KEY);
+  const sign = await wallet._signTypedData(STACKR_DOMAIN, ACTION_INPUT_TYPES, actionData);
+
+  return JSON.stringify({
+    msgSender: wallet.address,
+    signature: sign,
+    payload: actionData,
+  });
+};
+
+const updateProgramCounter = async (programCounter: number) => {
+  const data = {
+    type: 'update',
+    id: 5,
+    byteCode: Math.ceil(Math.random() * 10000).toString(),
+    programCounter,
+    transactionData: {
+      id: 5,
+      type: 'add',
+      hashs: 'abc',
+    },
+  };
+  const payload = getPayload(data);
+  const response = await rollupAxiosClient.post('', {
+    data: payload,
+  });
+  console.log('updateProgramCounter: ', response.data);
+};
+
+const updateTxHash = async (programCounter: number, txHash: string, type: string) => {
+  const data = {
+    type: 'addTransaction',
+    id: 5,
+    byteCode: Math.ceil(Math.random() * 10000).toString(),
+    programCounter,
+    transactionData: {
+      id: programCounter,
+      type,
+      hashs: txHash,
+    },
+  };
+  const payload = getPayload(data);
+  const response = await rollupAxiosClient.post('', {
+    data: payload,
+  });
+  console.log('updateTxHash: ', response.data);
+};
+
 const updateProgramCounterOnChain = async (
-  programId: string,
+  programId: number,
   newProgramCounter: number,
-  txs: { txHash: string; chainId: number }[]
+  txs: { txHash: string; chainId: number }[],
+  type: 'swap' | 'consolidate' | 'call'
 ) => {
-  const explorerLinks = txs.map((tx) => toExplorerUrl(tx.txHash, tx.chainId as any));
+  const explorerLinks = txs
+    .map((tx) => toExplorerUrl(tx.txHash, tx.chainId as any))
+    .reduce((a, b) => `${a},${b}`);
   console.log(
-    `Updating program counter for program ${programId} to ${newProgramCounter} with txs\n: \t${explorerLinks.join(
-      '\n\t'
-    )}`
+    `Updating program counter for program ${programId} to ${newProgramCounter} with txs\n: \t${explorerLinks}`
   );
+
+  await updateProgramCounter(programCounter);
+  await updateTxHash(programCounter, explorerLinks, type);
 };
 
 const OP_CODES: Record<string, string> = {
@@ -32,7 +93,7 @@ let stack: string[] = [];
 let smartAccountAddress: string;
 let programCounter = 0;
 
-export const execute = async (programId: string, bytecode: string) => {
+export const execute = async (programId: number, bytecode: string) => {
   stack = [];
   smartAccountAddress = '';
   programCounter = 0;
@@ -47,13 +108,13 @@ export const execute = async (programId: string, bytecode: string) => {
       token = token.slice(2);
     }
 
-    HANDLERS[token] ? await HANDLERS[token]() : await handleDefault(token);
+    HANDLERS[token] ? await HANDLERS[token](programCounter) : await handleDefault(token);
 
     ++programCounter;
   }
 };
 
-const handleUse = async () => {
+const handleUse = async (programId: number) => {
   console.log(`VM: USE`);
   if (stack.length < 1) {
     throw new Error('VM: USE: Not enough arguments');
@@ -63,7 +124,7 @@ const handleUse = async () => {
   console.log('VM: USE: Params: ', { smartAccountAddress });
 };
 
-const handleConsolidate = async () => {
+const handleConsolidate = async (programId: number) => {
   console.log(`VM: CONSOLIDATE`);
   if (stack.length < 1) {
     throw new Error('VM: CONSOLIDATE: Not enough arguments');
@@ -106,10 +167,10 @@ const handleConsolidate = async () => {
     console.log('VM: CONSOLIDATE: No txns need to be executed');
     return;
   }
-  await updateProgramCounterOnChain(smartAccountAddress, programCounter, txns);
+  await updateProgramCounterOnChain(programId, programCounter, txns, 'consolidate');
 };
 
-const handleSwap = async () => {
+const handleSwap = async (programId: number) => {
   console.log(`VM: SWAP`);
   if (stack.length < 4) {
     throw new Error('VM: SWAP: Not enough arguments');
@@ -135,10 +196,10 @@ const handleSwap = async () => {
   if (!txn) {
     throw new Error('VM: SWAP: No txns found');
   }
-  await updateProgramCounterOnChain(smartAccountAddress, programCounter, [txn]);
+  await updateProgramCounterOnChain(programId, programCounter, [txn], 'swap');
 };
 
-const handleCall = async () => {
+const handleCall = async (programId: number) => {
   console.log(`VM: CALL`);
   if (stack.length < 4) {
     throw new Error('VM: CALL: Not enough arguments');
@@ -158,7 +219,7 @@ const handleCall = async () => {
   if (!txn) {
     throw new Error('VM: CALL: No txns found');
   }
-  await updateProgramCounterOnChain(smartAccountAddress, programCounter, [txn]);
+  await updateProgramCounterOnChain(programId, programCounter, [txn], 'call');
 };
 
 const handleDefault = async (token: string) => {

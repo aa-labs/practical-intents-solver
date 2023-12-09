@@ -1,6 +1,7 @@
 import { EntryPoint_v006__factory } from '@biconomy/common';
 import * as dotenv from 'dotenv';
 import { Wallet, ethers } from 'ethers';
+import axios, { Axios } from 'axios';
 
 dotenv.config();
 
@@ -91,3 +92,56 @@ export const config = {
 export const BUNGEE_API_KEY = process.env.BUNGEE_API_KEY!;
 export const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY!;
 export const ONEINCH_API_KEY = process.env.ONEINCH_API_KEY!;
+
+export const rollupAxiosClient = new Axios({
+  ...axios.defaults,
+  baseURL: 'http://localhost:3000',
+  headers: {},
+});
+
+export const STACKR_PRIVATE_KEY = process.env.STACKR_PRIVATE_KEY!;
+export const STACKR_DOMAIN = {
+  name: 'Stackr MVP v0',
+  version: '1',
+  chainId: 69420,
+  verifyingContract: '0xe95157e7f6b65ccf3d7a2176d1162825a1436593',
+  salt: '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+};
+export const ACTION_INPUT_TYPES = {
+  TransactionData: [
+    {
+      name: 'id',
+      type: 'uint256',
+    },
+    {
+      name: 'type',
+      type: 'string',
+    },
+    {
+      name: 'hashs',
+      type: 'string',
+    },
+  ],
+  'update-state': [
+    {
+      name: 'type',
+      type: 'string',
+    },
+    {
+      name: 'id',
+      type: 'uint256',
+    },
+    {
+      name: 'byteCode',
+      type: 'string',
+    },
+    {
+      name: 'programCounter',
+      type: 'uint256',
+    },
+    {
+      name: 'transactionData',
+      type: 'TransactionData',
+    },
+  ],
+};

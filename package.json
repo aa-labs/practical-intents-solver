@@ -11,6 +11,7 @@
     "@biconomy/modules": "^3.1.0",
     "@biconomy/paymaster": "^3.1.0",
     "@socket.tech/socket-v2-sdk": "^1.24.1",
+    "@stackr/stackr-js": "0.1.6-alpha",
     "axios": "^1.6.2",
     "dotenv": "^16.3.1",
     "ethers": "5.7.2"
