@@ -166,5 +166,6 @@ export const swapHandler = async (
   console.log('Generated swap', tx);
 
   const smartAccount = smartAccounts[chainId];
-  await sendUserOp(tx, smartAccount, chainId);
+  const { hash } = await sendUserOp(tx, smartAccount, chainId);
+  return { txHash: hash, chainId };
 };

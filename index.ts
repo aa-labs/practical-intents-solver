@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers';
 import { swapHandler } from './solver/1inch';
 import { consolidateHandler } from './solver/bungee';
 import { NATIVE_TOKEN_ADDRESS, addressToTokenName } from './config/config';
-import { smartAccounts, bundlers, init } from './config/smart-account';
+import { init } from './config/smart-account';
 import { parseEther, parseUnits } from 'ethers/lib/utils';
 import { execute } from './interpreter';
 
@@ -22,6 +22,6 @@ import { execute } from './interpreter';
   //   await smartAccounts[42161].getAccountAddress()
   // );
   const bytecode =
-    '0xabcd_01_3130_415242_42415345_7a6b45564d_415242_3_02_3130_55534443_414e59_03_415242_3130_ashcdkhcbdhk_1234_04';
+    '0x0D125Df38bFd6eAA2478052ABB7d7E62d2CF604B_01_3131_415242_42415345_7a6b45564d_415242_3_02_415242_32303030_55534443_414e59_03_415242_3130303030303030303030303030__0D125Df38bFd6eAA2478052ABB7d7E62d2CF604B_04';
   await execute('0x1234', bytecode);
 })();

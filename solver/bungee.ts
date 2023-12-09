@@ -154,6 +154,7 @@ const waitUntilBridgeSucceeds = async (
 };
 
 const executeQuotes = async (quotes: { path: Path; route: Route }[], walletAddress: string) => {
+  const txHashes: { chainId: number; txHash: string }[] = [];
   for (const quote of quotes) {
     const smartAccount = smartAccounts[quote.path.fromChainId];
     if ((await smartAccount.getAccountAddress({})) !== walletAddress) {
@@ -193,7 +194,12 @@ const executeQuotes = async (quotes: { path: Path; route: Route }[], walletAddre
     const batch = [...(approvalTx ? [approvalTx] : []), sendTransaction];
     const { hash } = await sendUserOp(batch, smartAccount, quote.path.fromChainId);
     await waitUntilBridgeSucceeds(hash, quote.path.fromChainId, quote.path.toChainId);
+    txHashes.push({
+      txHash: hash,
+      chainId: quote.path.fromChainId,
+    });
   }
+  return txHashes;
 };
 
 export const consolidateHandler = async (
@@ -290,5 +296,5 @@ export const consolidateHandler = async (
   }
 
   // Execute the quotes
-  await executeQuotes(quotesToExecute, walletAddress);
+  return await executeQuotes(quotesToExecute, walletAddress);
 };

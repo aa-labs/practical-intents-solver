@@ -47,6 +47,14 @@ export const addressToTokenName = {
     '0xaf88d065e77c8cc2239327c5edb3a432268e5831': 'USDC',
   },
 };
+export const tokenNameToAddress = Object.fromEntries(
+  Object.entries(addressToTokenName).map(([chainId, tokenNameToAddress]) => [
+    chainId,
+    Object.fromEntries(
+      Object.entries(tokenNameToAddress).map(([address, tokenName]) => [tokenName, address])
+    ),
+  ])
+);
 
 export const config = {
   ownerPrivateKey: process.env.PRIVATE_KEY!,
