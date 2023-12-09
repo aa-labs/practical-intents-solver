@@ -71,6 +71,10 @@ const updateProgramCounterOnChain = async (
   txs: { txHash: string; chainId: number }[],
   type: 'swap' | 'consolidate' | 'call'
 ) => {
+  if (txs.length === 0) {
+    console.log('No txs to update');
+    return;
+  }
   const explorerLinks = txs
     .map((tx) => toExplorerUrl(tx.txHash, tx.chainId as any))
     .reduce((a, b) => `${a},${b}`);
