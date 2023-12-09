@@ -1,0 +1,31 @@
+{
+  "name": "bsdk-scripts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@biconomy/account": "^3.1.0",
+    "@biconomy/bundler": "^3.1.0",
+    "@biconomy/common": "^3.1.0",
+    "@biconomy/core-types": "^3.1.0",
+    "@biconomy/modules": "^3.1.0",
+    "@biconomy/paymaster": "^3.1.0",
+    "@socket.tech/socket-v2-sdk": "^1.24.1",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "ethers": "5.7.2"
+  },
+  "devDependencies": {
+    "0x": "^5.7.0",
+    "autocannon": "^7.12.0",
+    "clinic": "^13.0.0",
+    "typechain": "^8.3.2",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "trace": "0x -o build/index.js",
+    "prof": "node --prof build/index.js",
+    "typechain": "typechain --target=ethers-v5 --out-dir typechain abi/*.json"
+  }
+}
