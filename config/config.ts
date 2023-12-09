@@ -21,9 +21,9 @@ const paymasterApiKeys = {
 };
 
 const rpcUrls = {
-  1101: 'https://rpc.ankr.com/polygon_zkevm',
+  1101: 'https://polygonzkevm-mainnet.g.alchemy.com/v2/5SSCCpZLALU28NFyjQlA05y3a-8lRVo4',
   8453: 'https://base.llamarpc.com',
-  42161: 'https://arbitrum.llamarpc.com',
+  42161: 'https://arb-mainnet.g.alchemy.com/v2/j_x-t42wzTMnkB1gP03NRNTsbTaPvB9x',
 };
 
 export const explorerUrls = {

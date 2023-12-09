@@ -103,7 +103,8 @@ const handleConsolidate = async () => {
     smartAccountAddress
   );
   if (!txns) {
-    throw new Error('VM: CONSOLIDATE: No txns found');
+    console.log('VM: CONSOLIDATE: No txns need to be executed');
+    return;
   }
   await updateProgramCounterOnChain(smartAccountAddress, programCounter, txns);
 };
@@ -125,7 +126,7 @@ const handleSwap = async () => {
   }
 
   const txn = await swapHandler(
-    Object(addressToTokenName[chainId as keyof typeof addressToTokenName]).keys(),
+    Object.keys(addressToTokenName[chainId as keyof typeof addressToTokenName]),
     to,
     value,
     chainId,

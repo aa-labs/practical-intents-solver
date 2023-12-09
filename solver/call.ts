@@ -8,10 +8,18 @@ export const callHandler = async (
   value: BigNumber,
   callData: string
 ) => {
+  console.log('Calling call handler with args: ', {
+    smartAccountAddress,
+    chainId,
+    to,
+    value: value.toString(),
+    callData,
+  });
   const smartAccount = smartAccounts[chainId];
   if ((await smartAccount.getAccountAddress()) !== smartAccountAddress) {
     throw new Error('Smart account address mismatch');
   }
+  console.log('Executing call txn...');
 
   const { hash } = await sendUserOp([{ to, value, data: callData }], smartAccount, chainId);
   return { txHash: hash, chainId };

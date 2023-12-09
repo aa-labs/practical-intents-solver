@@ -18,9 +18,11 @@ export const tokensOwnedOnChain = async (
   chainId: keyof typeof addressToTokenName
 ): Promise<TokenRecord[]> => {
   const provider = config.provider[chainId];
+  let i = 0;
   const balances = (
     await Promise.all(
       Object.entries(addressToTokenName[chainId]).map(async ([address, symbol]) => {
+        await new Promise((resolve) => setTimeout(resolve, ++i * 500));
         if (address === NATIVE_TOKEN_ADDRESS) {
           const balanceInWei = await provider.getBalance(walletAddress);
           const balance = parseFloat(formatEther(balanceInWei));
