@@ -1,6 +1,6 @@
-import { rollupAxiosClient } from './config/config';
-import { init } from './config/smart-account';
-import { execute } from './interpreter';
+import { rollupAxiosClient } from "./config/config";
+import { init } from "./config/smart-account";
+import { execute } from "./interpreter";
 
 type Intent = {
   id: number;
@@ -9,11 +9,13 @@ type Intent = {
 };
 
 const getAllIntents = async (): Promise<Intent[]> => {
-  const response = await rollupAxiosClient.get('');
+  const response = await rollupAxiosClient.get("");
   const intents = response.data.currentCount.byteCodes;
-  console.log(`Received Intents: ${JSON.stringify(intents)}`);
+  // console.log(`Received Intents: ${JSON.stringify(intents)}`);
   return intents;
 };
+
+const map: any = [];
 
 (async () => {
   await init();
@@ -24,9 +26,13 @@ const getAllIntents = async (): Promise<Intent[]> => {
   const interval = setInterval(async () => {
     const intents = await getAllIntents();
 
-    const intentsToProcess = intents.filter(({ programCounter }) => programCounter === 0);
+    const intentsToProcess = intents.filter(
+      ({ programCounter, id }) => programCounter === 0 && !map[id]
+    );
 
     for (const intent of intentsToProcess) {
+      console.log(`Received Intents: ${JSON.stringify(intent)}`);
+      map[intent.id] = true;
       await execute(intent.id, intent.byteCode);
     }
   }, 5000);
